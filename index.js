@@ -1,30 +1,29 @@
 var React = require('react');
 var CanvasXpress = require('canvasxpress');
+require('canvasxpress/src/canvasXpress.css');
 
-class CanvasXpressGraph extends React.Component {
-  
-  static cX-ContainerId = 0;
+class CanvasXpressReact extends React.Component {
   
   constructor(props) {  
     super(props);  
-    this.data = props.data ? props.data : {};  
-    this.config = props.config ? props.config : {};  
-    this.events = props.events ? props.event : false;  
-    this.containerProps = props.containerProps ? props.containerProps : {width: "500", height: "500"};
-    this.containerProps.height = props.containerProps && props.containerProps.height ? props.containerProps.height : this.options.height ? this.options.height + "px" : "400px";
-    this.chartContainerId = "canvasXpress-react-graph-container-" + CanvasXpressGraph.cX-ContainerId++;
+    this.target = props.target ? props.target : false;  
+    this.data   = props.data ? props.data : false;  
+    this.config = props.config ? props.config : false;  
+    this.events = props.events ? props.event : false;
+    this.width  = props.width ? props.width : 500;  
+    this.height = props.height ? props.height : 500;
   } 
   
   componentDidMount() {
-    //Create Graph and Render  
-    this.graph = new CanvasXpress(this.graphContainerId, this.data, this.config, this.events);
+    //Create graph and render  
+    this.graph = new CanvasXpress.init(this.target, this.data, this.config, this.events);
     if (this.props.onRef) {
       this.props.onRef(this.graph);
     }
   } 
   
   shouldComponentUpdate(nextProps, nextState){
-    //Check if Chart-options has changed and determine if component has to be updated
+    //Check if graph config and data has changed and determine if component has to be updated
     return !(nextProps.data === this.data && nextProps.config === this.config);
   }
   
@@ -36,20 +35,17 @@ class CanvasXpressGraph extends React.Component {
   }
   
   componentWillUnmount() {
-    //Destroy chart and remove reference
+    //Destroy graph and remove reference
     this.graph.destroy();
     if (this.props.onRef) {
       this.props.onRef(undefined);
     }
   }
     
-  render() {  
-    //return React.createElement('div', { id: this.chartContainerId, style: this.containerProps });  
-    return <div id = {this.chartContainerId} style = {this.containerProps}/>  
+  render() {
+  	return React.createElement('canvas', { id: this.target, width: this.width, height: this.height });  
   }
    
 }
-
-var CanvasXpressReact = {CanvasXpressGraph : CanvasXpressGraph};
 
 export default CanvasXpressReact;
