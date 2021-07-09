@@ -9,7 +9,7 @@ class CanvasXpressReact extends React.Component {
     this.target = props.target ? props.target : false;  
     this.data   = props.data ? props.data : false;  
     this.config = props.config ? props.config : false;  
-    this.events = props.events ? props.event : false;
+    this.events = props.events ? props.events : false;
     this.width  = props.width ? props.width : 500;  
     this.height = props.height ? props.height : 500;
   } 
