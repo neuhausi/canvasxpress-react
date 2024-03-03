@@ -16,15 +16,15 @@ Step-By-Step instructions
 
 1- Create a React App
 
-Refer to documentation on <a href="https://reactjs.org/docs/create-a-new-react-app.html">Creating a New React App</a> for more info.
+&emsp; Refer to documentation on <a href="https://reactjs.org/docs/create-a-new-react-app.html">Creating a New React App</a> for more info.
 
 2- Install canvasxpress-react
 
-See above!
+&emsp; See the above [Installation](https://github.com/neuhausi/canvasxpress-react/edit/master/README.md#installation) section!
 
 3- Import CanvasXpress React Component
 
-Add the following code to your app.
+&emsp; Add the following code to your app eg, `index.js`.
 
 ```bash
 import React from 'react';
