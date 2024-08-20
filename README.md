@@ -62,6 +62,13 @@ var reactapp = document.createElement("div");
 document.body.appendChild(reactapp);
 ReactDOM.render(<Bar />, reactapp)
 ```
+Alternative Used
+-----------------
+
+Link to codesandbox repo:
+
+https://codesandbox.io/p/sandbox/canvasxpress-react-dmdpd4
+
 CanvasXpress Homepage
 ----------------------
 
