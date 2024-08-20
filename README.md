@@ -65,7 +65,7 @@ ReactDOM.render(<Bar />, reactapp)
 Alternative Used
 -----------------
 
-Link to codesandbox repo:
+Link to codesandbox repo (contributed by https://github.com/ktaouk1) :
 
 https://codesandbox.io/p/sandbox/canvasxpress-react-dmdpd4
 
