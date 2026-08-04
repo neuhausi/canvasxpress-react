@@ -2,7 +2,7 @@
   "name": "canvasxpress-react",
   "main": "index.js",
   "title": "CanvasXpress React",
-  "version": "64.9.0",
+  "version": "65.0.0",
   "license": {
     "type": "Dual licensing",
     "url": "https://www.canvasxpress.org/docs/license.html"
@@ -28,6 +28,6 @@
   },
   "homepage": "https://github.com/neuhausi/canvasxpress#readme",
   "dependencies": {
-    "canvasxpress": "^64.9.0"
+    "canvasxpress": "^65.0.0"
   }
 }
