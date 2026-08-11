@@ -24,30 +24,49 @@ class CanvasXpressReact extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState){
-    //Check if graph config and data has changed and determine if component has to be updated
-    return !(nextProps.data === this.data && nextProps.config === this.config);
+  shouldComponentUpdate(nextProps) {
+    //Re-render only when the incoming props differ from the CURRENT props.
+    //Comparing against the constructor snapshots (this.data/this.config) drifts
+    //after the first update, because those are never refreshed.
+    return nextProps.data !== this.props.data
+      || nextProps.config !== this.props.config
+      || nextProps.events !== this.props.events;
   }
 
   componentDidUpdate() {
-    //Update Graph Options & Data
-    this.graph.resetConfig();
-    this.graph.updateConfig(this.props.config);
-    this.graph.updateData(this.props.data);
+    //Update Graph Options & Data. Bail out if the graph never mounted.
+    if (!this.graph) {
+      return;
+    }
+    //resetConfig()/updateConfig() land in canvasxpress >= 65.4. Guard so an
+    //older library falls back to updateData's config-merge path instead of
+    //throwing on a missing method.
+    if (typeof this.graph.resetConfig === 'function' && typeof this.graph.updateConfig === 'function') {
+      this.graph.resetConfig();
+      //Second arg (n) = "do not draw": defer the redraw so only updateData below
+      //paints, avoiding a double render.
+      this.graph.updateConfig(this.props.config, true);
+      this.graph.updateData(this.props.data);
+    } else {
+      //Fallback: apply config alongside the data in a single redraw.
+      this.graph.updateData(this.props.data, true, false, this.props.config);
+    }
   }
 
   componentWillUnmount() {
     //Destroy graph and remove reference
-    this.graph.destroy();
+    if (this.graph) {
+      this.graph.destroy();
+    }
     if (this.props.onRef) {
       this.props.onRef(undefined);
     }
   }
 
   render() {
-    return React.createElement('canvas', { id: this.target, width: this.width, height: this.height, 'data-responsive': this.responsive, 'data-aspectratio': this.aspectratio});
+    return React.createElement('canvas', { id: this.target, width: this.width, height: this.height, 'data-responsive': this.responsive, 'data-aspectratio': this.aspectRatio});
   }
 
 }
 
-export default CanvasXpressReact;
+module.exports = CanvasXpressReact;
