@@ -8,8 +8,9 @@ import * as CanvasXpress from 'canvasxpress';
 export = CanvasXpressReact;
 
 interface CanvasXpressReactProps {
-  /** DOM id assigned to the rendered <canvas>. */
-  target: string;
+  /** DOM id applied to the rendered <canvas> (optional; the component uses an
+   *  internal ref, so a unique id is no longer required). */
+  target?: string;
   /** CanvasXpress data object. */
   data?: CanvasXpress.CXData;
   /** CanvasXpress configuration. */
@@ -28,7 +29,16 @@ interface CanvasXpressReactProps {
   onRef?: (instance: CanvasXpress.CanvasXpressInstance | undefined) => void;
 }
 
-declare class CanvasXpressReact extends React.Component<CanvasXpressReactProps> {
-  /** The live CanvasXpress instance, available after mount. */
-  graph?: CanvasXpress.CanvasXpressInstance;
-}
+/**
+ * The value resolved by a forwarded `ref`: the live CanvasXpress instance,
+ * carrying a `graph` self-alias for backward compatibility with code that read
+ * `ref.current.graph` off the previous class component.
+ */
+type CanvasXpressReactHandle = CanvasXpress.CanvasXpressInstance & {
+  /** Self-reference to the CanvasXpress instance (legacy accessor). */
+  graph: CanvasXpress.CanvasXpressInstance;
+};
+
+declare const CanvasXpressReact: React.ForwardRefExoticComponent<
+  CanvasXpressReactProps & React.RefAttributes<CanvasXpressReactHandle>
+>;

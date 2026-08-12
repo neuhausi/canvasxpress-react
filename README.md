@@ -62,6 +62,29 @@ var reactapp = document.createElement("div");
 document.body.appendChild(reactapp);
 ReactDOM.render(<Bar />, reactapp)
 ```
+Notes
+-----------------
+
+- Requires **React 16.8+** (the component is implemented with hooks).
+- `target` is **optional** — the component renders through an internal ref, so you
+  no longer need to supply a globally unique DOM id. If you do pass `target`, it is
+  applied as the `<canvas>` id.
+- The live CanvasXpress instance is available two ways: the `onRef` callback (fired
+  with the instance on mount and `undefined` on unmount), or a forwarded `ref`
+  (`ref.current` is the instance; `ref.current.graph` also resolves for backward
+  compatibility):
+
+```jsx
+import React, { useRef } from 'react';
+import CanvasXpressReact from 'canvasxpress-react';
+
+function Chart(props) {
+  const cx = useRef(null);
+  // cx.current is the CanvasXpress instance after mount
+  return <CanvasXpressReact ref={cx} data={props.data} config={props.config} />;
+}
+```
+
 Alternative Used
 -----------------
 

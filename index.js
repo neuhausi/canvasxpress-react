@@ -2,71 +2,88 @@ var React = require('react');
 var CanvasXpress = require('canvasxpress');
 require('canvasxpress/src/canvasXpress.css');
 
-class CanvasXpressReact extends React.Component {
+//Hooks-based wrapper (requires React >= 16.8). The previous release shipped a
+//class component; the public surface is unchanged: the same props are accepted,
+//onRef(instance) still fires on mount/unmount, and a forwarded ref now resolves
+//to the live CanvasXpress instance (with a .graph self-alias, so the old
+//ref.current.graph access keeps working).
+var CanvasXpressReact = React.forwardRef(function CanvasXpressReact(props, ref) {
 
-  constructor(props) {
-    super(props);
-    this.target = props.target ? props.target : false;
-    this.data   = props.data ? props.data : false;
-    this.config = props.config ? props.config : false;
-    this.events = props.events ? props.events : false;
-    this.width  = props.width ? props.width : 500;
-    this.height = props.height ? props.height : 500;
-    this.responsive = props.responsive ? props.responsive : false;
-    this.aspectRatio = props.aspectratio ? props.aspectratio : "1:1";
-  }
+  //A ref to the <canvas> node replaces the old required-unique `target` id, so
+  //two components can no longer collide on a shared DOM id. `target`, if passed,
+  //is still applied as the canvas id for backward compatibility.
+  var canvasRef = React.useRef(null);
+  var graphRef  = React.useRef(null);
 
-  componentDidMount() {
-    //Create graph and render
-    this.graph = new CanvasXpress.init(this.target, this.data, this.config, this.events);
-    if (this.props.onRef) {
-      this.props.onRef(this.graph);
+  //Expose the live instance through the forwarded ref, and mirror the legacy
+  //ref.current.graph accessor onto the instance itself (the engine never reads
+  //`.graph`, so this alias is inert).
+  React.useImperativeHandle(ref, function () {
+    var instance = graphRef.current;
+    if (instance && !instance.graph) {
+      instance.graph = instance;
     }
-  }
+    return instance;
+  });
 
-  shouldComponentUpdate(nextProps) {
-    //Re-render only when the incoming props differ from the CURRENT props.
-    //Comparing against the constructor snapshots (this.data/this.config) drifts
-    //after the first update, because those are never refreshed.
-    return nextProps.data !== this.props.data
-      || nextProps.config !== this.props.config
-      || nextProps.events !== this.props.events;
-  }
+  //Mount / unmount. Empty dependency list: build the graph once, tear it down on
+  //unmount. Data/config/event updates are handled by the effect below.
+  React.useEffect(function () {
+    graphRef.current = new CanvasXpress.init(
+      canvasRef.current,
+      props.data   ? props.data   : false,
+      props.config ? props.config : false,
+      props.events ? props.events : false
+    );
+    if (props.onRef) {
+      props.onRef(graphRef.current);
+    }
+    return function () {
+      if (graphRef.current) {
+        graphRef.current.destroy();
+        graphRef.current = null;
+      }
+      if (props.onRef) {
+        props.onRef(undefined);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  componentDidUpdate() {
-    //Update Graph Options & Data. Bail out if the graph never mounted.
-    if (!this.graph) {
+  //Re-apply data, config, and events whenever any of them change. The class
+  //component only refreshed data/config; events are now re-bound too (the engine
+  //reads handlers off instance.events).
+  React.useEffect(function () {
+    var graph = graphRef.current;
+    if (!graph) {
       return;
     }
+    graph.events = props.events ? props.events : false;
     //resetConfig()/updateConfig() land in canvasxpress >= 65.4. Guard so an
     //older library falls back to updateData's config-merge path instead of
     //throwing on a missing method.
-    if (typeof this.graph.resetConfig === 'function' && typeof this.graph.updateConfig === 'function') {
-      this.graph.resetConfig();
+    if (typeof graph.resetConfig === 'function' && typeof graph.updateConfig === 'function') {
+      graph.resetConfig();
       //Second arg (n) = "do not draw": defer the redraw so only updateData below
       //paints, avoiding a double render.
-      this.graph.updateConfig(this.props.config, true);
-      this.graph.updateData(this.props.data);
+      graph.updateConfig(props.config, true);
+      graph.updateData(props.data);
     } else {
       //Fallback: apply config alongside the data in a single redraw.
-      this.graph.updateData(this.props.data, true, false, this.props.config);
+      graph.updateData(props.data, true, false, props.config);
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.data, props.config, props.events]);
 
-  componentWillUnmount() {
-    //Destroy graph and remove reference
-    if (this.graph) {
-      this.graph.destroy();
-    }
-    if (this.props.onRef) {
-      this.props.onRef(undefined);
-    }
-  }
+  return React.createElement('canvas', {
+    ref: canvasRef,
+    id: props.target ? props.target : undefined,
+    width: props.width ? props.width : 500,
+    height: props.height ? props.height : 500,
+    'data-responsive': props.responsive ? props.responsive : false,
+    'data-aspectratio': props.aspectratio ? props.aspectratio : "1:1"
+  });
 
-  render() {
-    return React.createElement('canvas', { id: this.target, width: this.width, height: this.height, 'data-responsive': this.responsive, 'data-aspectratio': this.aspectRatio});
-  }
-
-}
+});
 
 module.exports = CanvasXpressReact;
