@@ -3,7 +3,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "title": "CanvasXpress React",
-  "version": "65.8.0",
+  "version": "65.9.0",
   "license": {
     "type": "Dual licensing",
     "url": "https://www.canvasxpress.org/docs/license.html"
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/neuhausi/canvasxpress#readme",
   "dependencies": {
-    "canvasxpress": "^65.8.0"
+    "canvasxpress": "^65.9.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
