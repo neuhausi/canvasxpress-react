@@ -3,10 +3,10 @@
   "main": "index.js",
   "types": "index.d.ts",
   "title": "CanvasXpress React",
-  "version": "67.4.0",
+  "version": "67.5.0",
   "license": {
     "type": "Dual licensing",
-    "url": "https://www.canvasxpress.org/docs/license.html"
+    "url": "https://www.canvasxpress.org/license.html"
   },
   "description" : "Node program to run canvasXpress with react",
   "repository" : {
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/neuhausi/canvasxpress#readme",
   "dependencies": {
-    "canvasxpress": "^67.4.0"
+    "canvasxpress": "^67.5.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
